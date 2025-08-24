@@ -23,6 +23,7 @@
             --success-color: #28a745;
             --caution-bg-color: #fff3e0; --caution-text-color: #e65100; --caution-border-color: #ffd180;
             --spinner-color: #1a73e8; --overlay-bg-color: rgba(255, 255, 255, 0.8);
+            --disabled-bg-color: #ccc;
         }
         @media (prefers-color-scheme: dark) {
             :root {
@@ -33,6 +34,7 @@
                 --success-color: #77dd77;
                 --caution-bg-color: #3e2723; --caution-text-color: #ffcc80; --caution-border-color: #e65100;
                 --spinner-color: #82b1ff; --overlay-bg-color: rgba(0, 0, 0, 0.7);
+                --disabled-bg-color: #555;
             }
         }
         
@@ -71,7 +73,10 @@
         .product-image { width: 100%; height: 150px; background-color: var(--secondary-bg-color); border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.2em; color: var(--secondary-text-color); pointer-events: none; }
         .product-name { font-size: 1.2em; font-weight: bold; margin-bottom: 5px; }
         .product-card p { flex-grow: 1; margin: 10px 0; font-size: 0.9rem; }
-        .product-price { font-size: 1.5em; font-weight: bold; color: var(--primary-color); margin-bottom: 20px; }
+        .price-container { margin-bottom: 20px; }
+        .product-price { font-size: 1.5em; font-weight: bold; color: var(--primary-color); }
+        .original-price { text-decoration: line-through; color: var(--secondary-text-color); font-size: 0.9em; margin-right: 8px; }
+        .discount-badge { background-color: var(--danger-color); color: var(--danger-text-color); padding: 2px 6px; border-radius: 4px; font-size: 0.8em; font-weight: bold; margin-left: 8px; }
         .premium-badge { font-size: 0.8rem; color: var(--primary-color); display: flex; align-items: center; gap: 4px; justify-content: center; margin-top: 8px; }
         .premium-badge svg { width: 14px; height: 14px; }
         #no-results { text-align: center; margin-top: 50px; font-size: 1.2rem; color: var(--secondary-text-color); }
@@ -87,21 +92,40 @@
         .detail-actions { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; }
 
         /* --- 商品詳細 --- */
-        .quantity-control { display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .quantity-control { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 15px; }
         .quantity-input { width: 60px; text-align: center; padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--card-bg-color); color: var(--text-color); }
         #product-detail-page .product-image { height: 300px; }
         .premium-badge-detail { font-size: 0.9rem; color: var(--primary-color); display: inline-flex; align-items: center; gap: 4px; vertical-align: middle; margin-left: 10px; }
         .premium-badge-detail svg { width: 16px; height: 16px; }
         .info-box { text-align: left; background-color: var(--secondary-bg-color); padding: 15px; border-radius: 8px; margin: 20px 0; }
         .info-box h4 { margin-top: 0; }
-        .shipping-options label { display: block; margin-bottom: 10px; cursor: pointer; }
         .shipping-info-line { display: flex; align-items: center; gap: 8px; }
         .shipping-info-line svg { flex-shrink: 0; }
         .free-shipping-emphasis { font-weight: 700; color: var(--success-color); }
         .free-shipping-emphasis svg { color: var(--success-color); }
         .date-time-picker { display: flex; gap: 10px; margin-top: 10px; }
         .date-time-picker input, .date-time-picker select { padding: 8px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--card-bg-color); color: var(--text-color); }
+        .condition-selector { margin-top: 20px; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; }
+        .condition-option { display: block; padding: 8px; margin: 5px 0; border-radius: 6px; cursor: pointer; border: 1px solid transparent; }
+        .condition-option:has(input:checked) { background-color: var(--secondary-bg-color); border-color: var(--primary-color); }
+        .condition-option span { margin-left: 8px; }
+        .condition-price { font-weight: bold; }
+        .condition-state { font-size: 0.9rem; color: var(--secondary-text-color); }
         
+        /* --- スイッチスタイル --- */
+        .shipping-options .option-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .shipping-options .option-item .option-label { color: var(--text-color); }
+        .shipping-options .option-item[data-disabled="true"] .option-label { color: var(--secondary-text-color); }
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--secondary-bg-color); border: 1px solid var(--border-color); transition: .4s; border-radius: 26px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: var(--primary-color); border-color: var(--primary-color); }
+        input:checked + .slider:before { transform: translateX(24px); }
+        input:disabled + .slider { cursor: not-allowed; background-color: var(--disabled-bg-color); border-color: var(--disabled-bg-color); }
+        input:disabled + .slider:before { background-color: #f5f5f5; }
+        @media (prefers-color-scheme: dark) { input:disabled + .slider:before { background-color: #888; } }
+
         /* --- モーダル --- */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 10000; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
         .modal.visible { opacity: 1; pointer-events: auto; }
@@ -190,20 +214,43 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const SHIPPING_FEE = 500;
+
         // --- データ生成 ---
         const generateProducts = () => {
             const products = [];
             const baseNames = ['ガジェット', 'ツール', 'デバイス', 'キット', 'システム'];
             const adjectives = ['高性能', '多機能', 'ポータブル', 'スマート', 'エコフレンドリー', 'プロ仕様'];
+            const usedConditions = [
+                { id: 'used-1', name: '非常に良い', discount: 0.15 },
+                { id: 'used-2', name: '良い', discount: 0.3 },
+                { id: 'used-3', name: '可', discount: 0.5 }
+            ];
+
             for (let i = 1; i <= 100; i++) {
                 const isPremium = Math.random() > 0.4;
+                const originalPrice = Math.floor(Math.random() * (20000 - 500 + 1) + 500);
+                const isFreeShipping = Math.random() > 0.7; // 30%が送料無料
+                const discountRate = Math.random() > 0.6 ? Math.floor(Math.random() * 41) + 10 : 0; // 40%が割引対象
+
+                let usedOptions = [];
+                if (Math.random() > 0.5) { // 50%に中古品あり
+                     usedOptions = usedConditions.map(cond => ({
+                        id: cond.id,
+                        name: cond.name,
+                        price: Math.round(originalPrice * (1 - discountRate/100) * (1 - cond.discount))
+                    }));
+                }
+                
                 products.push({
                     id: i,
                     name: `デモ商品 ${adjectives[i % adjectives.length]} ${baseNames[i % baseNames.length]} #${i}`,
-                    price: Math.floor(Math.random() * (20000 - 500 + 1) + 500),
+                    price: originalPrice,
                     description: `これは自動生成された商品 #${i} の説明文です。最先端の技術と洗練されたデザインが融合した、テストに最適な一品です。${isPremium ? 'この商品はプレミアム配送の対象です。' : ''}`,
-                    isPremiumEligible: isPremium
+                    isPremiumEligible: isPremium,
+                    isFreeShipping: isFreeShipping,
+                    shippingFee: isFreeShipping ? 0 : Math.floor(Math.random() * (500 - 100 + 1)) + 100,
+                    discountRate: discountRate,
+                    usedOptions: usedOptions
                 });
             }
             return products;
@@ -263,19 +310,14 @@
                 btn.addEventListener('click', (e) => {
                     const modal = document.getElementById(e.currentTarget.dataset.target);
                     modal.classList.remove('visible');
-                    if (modal.id === 'delivery-status-modal') {
-                        clearInterval(deliveryStatusInterval);
-                    }
+                    if (modal.id === 'delivery-status-modal') clearInterval(deliveryStatusInterval);
                 });
             });
             productGrid.addEventListener('click', e => {
                 const card = e.target.closest('.product-card');
                 if (card) showProductDetailPage(parseInt(card.dataset.id, 10));
             });
-            searchInput.addEventListener('input', e => {
-                currentSearchTerm = e.target.value;
-                filterAndRenderProducts();
-            });
+            searchInput.addEventListener('input', e => { currentSearchTerm = e.target.value; filterAndRenderProducts(); });
             getEl('apply-filters-btn').addEventListener('click', () => {
                 currentFilters.premiumOnly = getEl('filter-premium').checked;
                 currentFilters.sortBy = getEl('filter-sort').value;
@@ -286,7 +328,8 @@
                 if (e.target.closest('#cancel-premium-btn')) cancelPremium();
                 if (e.target.closest('#reset-data-btn')) resetAllData();
                 if (e.target.closest('.remove-from-cart-btn')) {
-                    cart = cart.filter(item => item.id !== parseInt(e.target.closest('.remove-from-cart-btn').dataset.id, 10));
+                    const itemId = e.target.closest('.remove-from-cart-btn').dataset.itemId;
+                    cart = cart.filter(item => item.cartItemId !== itemId);
                     updateCart();
                 }
                 if (e.target.closest('.delivery-tracking-btn')) {
@@ -295,15 +338,20 @@
                 }
             });
             productDetailPage.addEventListener('change', e => {
-                if(e.target.id === 'shipping-scheduled-checkbox') {
-                    getEl('date-time-picker-container').classList.toggle('hidden', !e.target.checked);
-                    if (!e.target.checked) getEl('delivery-date').value = '';
-                    updateDeliveryDateDisplay();
-                }
-                if(e.target.id === 'delivery-date') {
-                    updateDeliveryDateDisplay(e.target.value);
+                 if (e.target.name === 'condition-option' || e.target.id === 'shipping-express-checkbox' || e.target.id === 'shipping-scheduled-checkbox' || e.target.id === 'delivery-date') {
+                    const productId = parseInt(e.target.closest('.product-detail-content').dataset.productId, 10);
+                    updateDetailDisplay(productId);
                 }
             });
+        };
+        
+        // --- ヘルパー関数 ---
+        const getDiscountedPrice = (price, discountRate) => Math.round(price * (1 - discountRate / 100));
+        const formatDate = (date) => date.toLocaleDateString('ja-JP', { month: 'long', day: 'numeric' });
+        const getDeliveryDate = (isExpress) => {
+            const date = new Date();
+            date.setDate(date.getDate() + (isExpress ? 1 : 2));
+            return date;
         };
 
         // --- UI更新 / ページ遷移 ---
@@ -337,8 +385,8 @@
                 filteredProducts = filteredProducts.filter(p => p.isPremiumEligible);
             }
             switch (currentFilters.sortBy) {
-                case 'price-asc': filteredProducts.sort((a, b) => a.price - b.price); break;
-                case 'price-desc': filteredProducts.sort((a, b) => b.price - a.price); break;
+                case 'price-asc': filteredProducts.sort((a, b) => getDiscountedPrice(a.price, a.discountRate) - getDiscountedPrice(b.price, b.discountRate)); break;
+                case 'price-desc': filteredProducts.sort((a, b) => getDiscountedPrice(b.price, b.discountRate) - getDiscountedPrice(a.price, a.discountRate)); break;
             }
             renderProductList(filteredProducts);
         };
@@ -351,8 +399,16 @@
                 card.className = 'product-card';
                 card.dataset.id = product.id;
                 card.style.animation = `fadeIn 0.4s ease-out ${index * 0.03}s forwards`;
+                
+                let priceHtml;
+                if (product.discountRate > 0) {
+                    priceHtml = `<span class="original-price">¥${product.price.toLocaleString()}</span> <span class="product-price">¥${getDiscountedPrice(product.price, product.discountRate).toLocaleString()}</span><span class="discount-badge">-${product.discountRate}%</span>`;
+                } else {
+                    priceHtml = `<span class="product-price">¥${product.price.toLocaleString()}</span>`;
+                }
+                
                 const premiumBadge = product.isPremiumEligible ? `<div class="premium-badge"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"/></svg> プレミアム対象</div>` : '';
-                card.innerHTML = `<div class="product-image">画像 #${product.id}</div><div class="product-name">${product.name}</div><p>${product.description.substring(0, 35)}...</p>${premiumBadge}<div class="product-price">価格 (デモ): ¥${product.price.toLocaleString()}</div>`;
+                card.innerHTML = `<div class="product-image">画像 #${product.id}</div><div class="product-name">${product.name}</div><p>${product.description.substring(0, 35)}...</p>${premiumBadge}<div class="price-container">${priceHtml} (税込)</div>`;
                 productGrid.appendChild(card);
             });
             applyFadeInAnimation('#product-list-page');
@@ -363,25 +419,38 @@
             const isFavorited = favorites.includes(productId);
             const truckIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16"><path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5zm1.294 7.456A2 2 0 0 1 4.732 11h5.536a2 2 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456M12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2"/></svg>`;
             const premiumBadge = product.isPremiumEligible ? `<span class="premium-badge-detail"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"/></svg> プレミアム対象</span>` : '';
-            
-            let shippingSection = '';
-            if (product.isPremiumEligible && isPremiumMember) {
-                 shippingSection = `<div class="info-box"><div class="shipping-info-line free-shipping-emphasis">${truckIcon}<span>配送料 (デモ): <span style="text-decoration: line-through;">¥${SHIPPING_FEE}</span> ¥0 (無料)</span></div></div>
-                    <div class="info-box shipping-options"><h4>配送オプション</h4><label><input type="checkbox" id="shipping-express-checkbox"> お急ぎ便を利用する</label><label><input type="checkbox" id="shipping-scheduled-checkbox"> お届け日時指定便を利用する</label>
-                    <div id="date-time-picker-container" class="hidden"><div class="date-time-picker"><input type="date" id="delivery-date"><select id="delivery-time"><option>午前中</option><option>14-16時</option><option>16-18時</option><option>18-20時</option><option>19-21時</option></select></div></div></div>`;
-            } else {
-                 shippingSection = `<div class="info-box"><div class="shipping-info-line">${truckIcon}<span>配送料 (デモ): ¥${SHIPPING_FEE} ${product.isPremiumEligible ? '(プレミアム会員は無料)' : ''}</span></div></div>`;
-            }
 
-            const today = new Date();
-            const deliveryDate = new Date(new Date().setDate(today.getDate() + 2)).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+            let conditionOptionsHtml = `<label class="condition-option"><input type="radio" name="condition-option" value="new" checked><span>新品</span></label>`;
+            product.usedOptions.forEach(opt => {
+                conditionOptionsHtml += `<label class="condition-option"><input type="radio" name="condition-option" value="${opt.id}"><span>中古品 - <span class="condition-state">${opt.name}</span></span></label>`;
+            });
 
-            productDetailPage.innerHTML = `<div class="product-detail-content">
+            const premiumOnlyDisabled = isPremiumMember ? '' : 'disabled';
+
+            productDetailPage.innerHTML = `<div class="product-detail-content" data-product-id="${product.id}">
                 <button class="btn back-button" style="flex-grow:0; margin-bottom: 20px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/></svg> 商品一覧に戻る</button>
                 <div class="product-image">画像 #${product.id}</div><h2>${product.name}${premiumBadge}</h2><p>${product.description}</p>
-                <div class="product-price">価格 (デモ): ¥${product.price.toLocaleString()}</div>
-                <div class="info-box" id="delivery-date-display">お届け予定: ${deliveryDate} (デモ)</div>
-                ${shippingSection}
+                <div id="price-display" class="price-container" style="text-align:center; font-size:1.2em;"></div>
+                <div id="delivery-info-display" class="info-box">${truckIcon} <span></span></div>
+                <div class="condition-selector"><h4>商品の状態を選択</h4>${conditionOptionsHtml}</div>
+                <div class="info-box shipping-options">
+                    <h4>配送オプション (プレミアム会員限定)</h4>
+                    <div class="option-item" id="express-option-item">
+                        <span class="option-label">お急ぎ便を利用する</span>
+                        <label class="switch">
+                            <input type="checkbox" id="shipping-express-checkbox" ${premiumOnlyDisabled}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="option-item" id="scheduled-option-item">
+                         <span class="option-label">お届け日時指定便を利用する</span>
+                         <label class="switch">
+                            <input type="checkbox" id="shipping-scheduled-checkbox" ${premiumOnlyDisabled}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div id="date-time-picker-container" class="hidden"><div class="date-time-picker"><input type="date" id="delivery-date"><select id="delivery-time"><option>午前中</option><option>14-16時</option><option>16-18時</option><option>18-20時</option><option>19-21時</option></select></div></div>
+                </div>
                 <div class="quantity-control"><label for="quantity-input">数量:</label><input type="number" id="quantity-input" class="quantity-input" value="1" min="1" max="99"></div>
                 <div class="detail-actions">
                     <button class="btn add-to-cart-btn" data-id="${product.id}">カートに入れる</button>
@@ -389,54 +458,97 @@
                 </div>
             </div>`;
             
-            const dateInput = getEl('delivery-date');
-            if (dateInput) {
-                const minDate = new Date();
-                minDate.setDate(minDate.getDate() + 1);
-                dateInput.min = minDate.toISOString().split('T')[0];
-            }
-            
+            updateDetailDisplay(productId);
+
             productDetailPage.querySelector('.back-button').addEventListener('click', showProductListPage);
             productDetailPage.querySelector('.add-to-cart-btn').addEventListener('click', e => {
+                const selectedCondition = document.querySelector('input[name="condition-option"]:checked').value;
                 const isExpress = getEl('shipping-express-checkbox')?.checked || false;
                 const isScheduled = getEl('shipping-scheduled-checkbox')?.checked || false;
                 let deliveryDate = null, deliveryTime = null;
                 if (isScheduled) {
                     deliveryDate = getEl('delivery-date').value;
                     deliveryTime = getEl('delivery-time').value;
-                    if (!deliveryDate) {
-                        alert('お届け日を指定してください。');
-                        return;
-                    }
+                    if (!deliveryDate) { alert('お届け日を指定してください。'); return; }
                 }
                 const options = { isExpress, isScheduled, deliveryDate, deliveryTime };
-                addToCart(parseInt(e.target.dataset.id, 10), parseInt(getEl('quantity-input').value, 10), options);
+                addToCart(parseInt(e.target.dataset.id, 10), parseInt(getEl('quantity-input').value, 10), selectedCondition, options);
             });
             productDetailPage.querySelector('.favorite-btn').addEventListener('click', e => toggleFavorite(parseInt(e.currentTarget.dataset.id, 10)));
             applyFadeInAnimation('#product-detail-page > .product-detail-content');
         };
         
-        const updateDeliveryDateDisplay = (selectedDate) => {
-            const displayEl = getEl('delivery-date-display');
-            if (!displayEl) return;
-            if (selectedDate) {
-                 const date = new Date(selectedDate + 'T00:00:00'); // タイムゾーン問題を回避
-                 displayEl.textContent = `お届け予定: ${date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })} (指定日)`;
-            } else {
-                 const today = new Date();
-                 const defaultDeliveryDate = new Date(new Date().setDate(today.getDate() + 2)).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
-                 displayEl.textContent = `お届け予定: ${defaultDeliveryDate} (デモ)`;
-            }
-        };
+        const updateDetailDisplay = (productId) => {
+            const product = products.find(p => p.id === productId);
+            const selectedConditionId = document.querySelector('input[name="condition-option"]:checked').value;
+            const expressCheckbox = getEl('shipping-express-checkbox');
+            const scheduledCheckbox = getEl('shipping-scheduled-checkbox');
 
+            // プレミアム会員でない場合はスイッチを無効化し、チェックを外す
+            if (!isPremiumMember) {
+                expressCheckbox.checked = false;
+                scheduledCheckbox.checked = false;
+                expressCheckbox.disabled = true;
+                scheduledCheckbox.disabled = true;
+                getEl('express-option-item').dataset.disabled = true;
+                getEl('scheduled-option-item').dataset.disabled = true;
+            } else {
+                expressCheckbox.disabled = false;
+                scheduledCheckbox.disabled = false;
+                 getEl('express-option-item').dataset.disabled = false;
+                getEl('scheduled-option-item').dataset.disabled = false;
+            }
+            
+            const isExpress = expressCheckbox.checked;
+            
+            // 価格と状態の取得
+            let currentPrice, priceHtml;
+            if (selectedConditionId === 'new') {
+                currentPrice = getDiscountedPrice(product.price, product.discountRate);
+                if (product.discountRate > 0) {
+                    priceHtml = `<span class="original-price">¥${product.price.toLocaleString()}</span> <span class="product-price">¥${currentPrice.toLocaleString()}</span><span class="discount-badge">-${product.discountRate}%</span> (税込)`;
+                } else {
+                    priceHtml = `<span class="product-price">¥${product.price.toLocaleString()}</span> (税込)`;
+                }
+            } else {
+                const usedOpt = product.usedOptions.find(o => o.id === selectedConditionId);
+                currentPrice = usedOpt.price;
+                priceHtml = `<span class="product-price">¥${currentPrice.toLocaleString()}</span> (税込)`;
+            }
+            getEl('price-display').innerHTML = priceHtml;
+            
+            // 送料と配送日の計算と表示
+            let shippingFee = product.shippingFee;
+            if (isPremiumMember && (product.isPremiumEligible || isExpress)) {
+                shippingFee = 0;
+            }
+            
+            const deliveryDate = getEl('delivery-date').value;
+            const isScheduled = scheduledCheckbox.checked;
+            
+            let deliveryDateObj = deliveryDate && isScheduled ? new Date(deliveryDate + 'T00:00:00') : getDeliveryDate(isExpress);
+            
+            let deliveryText;
+            if (shippingFee === 0) {
+                deliveryText = `<span class="free-shipping-emphasis">無料配送</span> ${formatDate(deliveryDateObj)}にお届け (デモ)`;
+            } else {
+                deliveryText = `配送料 ¥${shippingFee} ${formatDate(deliveryDateObj)}にお届け (デモ)`;
+            }
+            getEl('delivery-info-display').querySelector('span').innerHTML = deliveryText;
+
+            // 日時指定ピッカーの表示制御
+            getEl('date-time-picker-container').classList.toggle('hidden', !isScheduled || !isPremiumMember);
+        };
+        
         // --- 機能別関数 ---
-        const addToCart = (productId, quantity, options) => {
+        const addToCart = (productId, quantity, selectedConditionId, options) => {
             if (isNaN(quantity) || quantity <= 0) return;
-            const existingItem = cart.find(item => item.id === productId);
+            const cartItemId = `${productId}-${selectedConditionId}`;
+            const existingItem = cart.find(item => item.cartItemId === cartItemId);
             if (existingItem) {
                 existingItem.quantity += quantity;
             } else {
-                cart.push({ id: productId, quantity, options });
+                cart.push({ cartItemId, id: productId, quantity, selectedConditionId, options });
             }
             updateCartBadge();
             alert(`${quantity}個の商品をカートに追加しました。`);
@@ -448,28 +560,46 @@
             cartFooter.classList.toggle('hidden', isEmpty);
             if (isEmpty) return;
 
-            const subtotal = cart.reduce((sum, item) => {
-                const product = products.find(p => p.id === item.id);
-                return sum + (product.price * item.quantity);
-            }, 0);
-            
-            // カート内に配送料が必要な商品が1つでもあるかチェック
-            const requiresShippingFee = cart.some(item => {
-                const product = products.find(p => p.id === item.id);
-                // プレミアム会員でなく、商品がプレミアム対象外の場合に送料が必要
-                return !isPremiumMember || !product.isPremiumEligible;
-            });
+            let subtotal = 0;
+            let totalShipping = 0;
 
-            const shippingFee = requiresShippingFee ? SHIPPING_FEE : 0;
-            const total = subtotal + shippingFee;
+            cart.forEach(item => {
+                const product = products.find(p => p.id === item.id);
+                let price;
+                if (item.selectedConditionId === 'new') {
+                    price = getDiscountedPrice(product.price, product.discountRate);
+                } else {
+                    const usedOpt = product.usedOptions.find(o => o.id === item.selectedConditionId);
+                    price = usedOpt.price;
+                }
+                subtotal += price * item.quantity;
+                
+                let itemShipping = product.shippingFee;
+                if (isPremiumMember && (product.isPremiumEligible || item.options?.isExpress)) {
+                    itemShipping = 0;
+                }
+                totalShipping += itemShipping;
+            });
+            
+            const total = subtotal + totalShipping;
 
             cartItemsContainer.innerHTML = cart.map(item => {
                 const product = products.find(p => p.id === item.id);
-                return `<div class="cart-item"><div class="cart-item-img">#${product.id}</div><div class="cart-item-details"><div>${product.name}</div><div>価格 (デモ): ¥${product.price.toLocaleString()} x ${item.quantity}</div></div><div class="cart-item-actions"><button class="remove-from-cart-btn" data-id="${product.id}">削除</button></div></div>`;
+                let price, nameSuffix = '';
+                if (item.selectedConditionId === 'new') {
+                    price = getDiscountedPrice(product.price, product.discountRate);
+                    nameSuffix = ' (新品)';
+                } else {
+                    const usedOpt = product.usedOptions.find(o => o.id === item.selectedConditionId);
+                    price = usedOpt.price;
+                    nameSuffix = ` (中古品 - ${usedOpt.name})`;
+                }
+
+                return `<div class="cart-item"><div class="cart-item-img">#${product.id}</div><div class="cart-item-details"><div>${product.name}${nameSuffix}</div><div>価格 (デモ): ¥${price.toLocaleString()} x ${item.quantity}</div></div><div class="cart-item-actions"><button class="remove-from-cart-btn" data-item-id="${item.cartItemId}">削除</button></div></div>`;
             }).join('');
             
             cartSubtotalEl.textContent = `商品小計 (デモ): ¥${subtotal.toLocaleString()}`;
-            cartShippingFeeEl.textContent = `配送料 (デモ): ¥${shippingFee.toLocaleString()}`;
+            cartShippingFeeEl.textContent = `配送料合計 (デモ): ¥${totalShipping.toLocaleString()}`;
             cartTotalEl.textContent = `ご請求額 (デモ): ¥${total.toLocaleString()}`;
             
             addGooglePayButtonToCart(total);
@@ -484,18 +614,15 @@
         
         const showUserProfile = () => {
             const historyHtml = purchaseHistory.length > 0 ? purchaseHistory.map(order => {
-                const itemsHtml = order.items.map(p => `${p.name} (x${p.quantity})`).join('<br>');
+                const itemsHtml = order.items.map(p => `${p.name} ${p.nameSuffix || ''} (x${p.quantity})`).join('<br>');
                 let deliveryHtml = '';
-                if (order.options?.isScheduled && order.options?.deliveryDate) {
-                    deliveryHtml = `<div class="delivery-info">お届け日時指定: ${order.options.deliveryDate} ${order.options.deliveryTime}</div>`;
-                } else if (order.options?.isExpress) {
-                    deliveryHtml = `<div class="delivery-info">お急ぎ便利用</div>`;
-                }
+                if (order.options?.isScheduled && order.options?.deliveryDate) deliveryHtml = `<div class="delivery-info">お届け日時指定: ${order.options.deliveryDate} ${order.options.deliveryTime}</div>`;
+                else if (order.options?.isExpress) deliveryHtml = `<div class="delivery-info">お急ぎ便利用</div>`;
                 const trackingBtn = `<button class="delivery-tracking-btn" data-order-id="${order.id}" title="配送状況を確認"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16"><path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5zm1.294 7.456A2 2 0 0 1 4.732 11h5.536a2 2 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456M12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2"/></svg></button>`;
                 return `<div class="history-item"><div class="history-item-details">${itemsHtml}${deliveryHtml}</div><div class="history-item-date">${order.date} ${trackingBtn}</div></div>`;
             }).join('') : '<p>購入履歴はありません。</p>';
             
-            const favoritesHtml = favorites.length > 0 ? favorites.map(favId => { const p = products.find(p => p.id === favId); return p ? `<div class="favorite-item"><span>${p.name}</span><span>価格 (デモ): ¥${p.price.toLocaleString()}</span></div>` : '' }).join('') : '<p>お気に入り商品はありません。</p>';
+            const favoritesHtml = favorites.length > 0 ? favorites.map(favId => { const p = products.find(p => p.id === favId); return p ? `<div class="favorite-item"><span>${p.name}</span><span>価格 (デモ): ¥${getDiscountedPrice(p.price, p.discountRate).toLocaleString()} (税込)</span></div>` : '' }).join('') : '<p>お気に入り商品はありません。</p>';
             const premiumStatusHtml = isPremiumMember ? `<p>プレミアムメンバーです。</p><button id="cancel-premium-btn" class="btn btn-danger">メンバーシップ (デモ) を解約する</button>` : `<p>プレミアムメンバーではありません。</p>`;
             getEl('user-profile-content').innerHTML = `<div class="profile-section"><strong>ユーザーID:</strong><p style="word-break:break-all;">${userId}</p></div><div class="profile-section"><strong>メンバーシップ (デモ):</strong>${premiumStatusHtml}</div><div class="profile-section"><h4>購入履歴</h4>${historyHtml}</div><div class="profile-section"><h4>お気に入り</h4>${favoritesHtml}</div><div class="profile-section" style="margin-top: 30px;"><button id="reset-data-btn" class="btn btn-danger">全データリセット</button></div>`;
             userProfileModal.classList.add('visible');
@@ -528,36 +655,20 @@
             clearInterval(deliveryStatusInterval);
             const order = purchaseHistory.find(o => o.id === orderId);
             if (!order) return;
-
-            // deliverySim オブジェクトがなければ初期化
-            if (!order.deliverySim) {
-                order.deliverySim = { startTime: null, completed: false };
-            }
-
-            // 初めて追跡ボタンが押された場合、開始時刻を記録
+            if (!order.deliverySim) order.deliverySim = { startTime: null, completed: false };
             if (order.deliverySim.startTime === null && !order.deliverySim.completed) {
                 order.deliverySim.startTime = Date.now();
                 localStorage.setItem('purchaseHistory', JSON.stringify(purchaseHistory));
             }
-            
-            // UI要素の取得
-            const progressBar = getEl('delivery-progress-bar');
-            const statusText = getEl('delivery-status-text');
-            const completeMsg = getEl('delivery-complete-msg');
-
-            // シミュレーション設定
+            const progressBar = getEl('delivery-progress-bar'), statusText = getEl('delivery-status-text'), completeMsg = getEl('delivery-complete-msg');
             const statuses = ['注文を受け付けました', '発送準備中', '発送済み', '配送中', 'お届け完了'];
             const isExpress = order.options?.isExpress || false;
             const intervalTime = isExpress ? 1000 : 2000;
-            
             let currentStatusIndex = 0;
-
             const updateUI = () => {
                 if (currentStatusIndex >= statuses.length) return;
-                
                 statusText.textContent = statuses[currentStatusIndex];
                 progressBar.style.width = `${(currentStatusIndex / (statuses.length - 1)) * 100}%`;
-
                 if (currentStatusIndex === statuses.length - 1) {
                     if (!order.deliverySim.completed) {
                        order.deliverySim.completed = true;
@@ -565,44 +676,19 @@
                     }
                     completeMsg.classList.remove('hidden');
                     clearInterval(deliveryStatusInterval);
-                } else {
-                    completeMsg.classList.add('hidden');
-                }
+                } else completeMsg.classList.add('hidden');
             };
-            
-            // シミュレーションが完了済みの場合は、最終状態を表示して終了
-            if (order.deliverySim.completed) {
-                currentStatusIndex = statuses.length - 1;
-                updateUI();
-                deliveryStatusModal.classList.add('visible');
-                return;
-            }
-
-            // 経過時間から現在の状態を計算
+            if (order.deliverySim.completed) { currentStatusIndex = statuses.length - 1; updateUI(); deliveryStatusModal.classList.add('visible'); return; }
             const elapsedTime = Date.now() - order.deliverySim.startTime;
-            const initialStatusIndex = Math.min(Math.floor(elapsedTime / intervalTime), statuses.length - 1);
-            currentStatusIndex = initialStatusIndex;
+            currentStatusIndex = Math.min(Math.floor(elapsedTime / intervalTime), statuses.length - 1);
             updateUI();
-
-            // 次の更新までの残り時間を計算
-            const remainingTime = intervalTime - (elapsedTime % intervalTime);
-
-            // シミュレーションがまだ終わっていなければ、次の更新をスケジュールする
             if (currentStatusIndex < statuses.length - 1) {
+                const remainingTime = intervalTime - (elapsedTime % intervalTime);
                 setTimeout(() => {
-                    currentStatusIndex++;
-                    updateUI();
-                    
-                    // 最初のsetTimeoutの後、通常のsetIntervalを開始
-                    if (currentStatusIndex < statuses.length - 1) {
-                        deliveryStatusInterval = setInterval(() => {
-                            currentStatusIndex++;
-                            updateUI();
-                        }, intervalTime);
-                    }
+                    currentStatusIndex++; updateUI();
+                    if (currentStatusIndex < statuses.length - 1) deliveryStatusInterval = setInterval(() => { currentStatusIndex++; updateUI(); }, intervalTime);
                 }, remainingTime);
             }
-
             deliveryStatusModal.classList.add('visible');
         };
 
@@ -613,9 +699,19 @@
             const newPurchase = { 
                 id: self.crypto.randomUUID(),
                 date: new Date().toLocaleString('ja-JP'), 
-                items: cart.map(item => ({...products.find(p => p.id === item.id), quantity: item.quantity })),
+                items: cart.map(item => {
+                    const product = products.find(p => p.id === item.id);
+                    let nameSuffix = '';
+                    if(item.selectedConditionId !== 'new') {
+                        const usedOpt = product.usedOptions.find(o => o.id === item.selectedConditionId);
+                        nameSuffix = ` (中古品 - ${usedOpt.name})`;
+                    } else {
+                        nameSuffix = ` (新品)`;
+                    }
+                    return {...product, quantity: item.quantity, nameSuffix: nameSuffix};
+                }),
                 options: purchaseOptions,
-                deliverySim: { startTime: null, completed: false } // 配送シミュレーション状態を追加
+                deliverySim: { startTime: null, completed: false }
             };
 
             purchaseHistory.unshift(newPurchase);
@@ -623,58 +719,24 @@
             cart = [];
             updateCart();
             cartModal.classList.remove('visible');
-            
-            // 購入直後の自動追跡は行わず、ユーザー操作を待つ
-            // startDeliveryTracking(newPurchase.id); 
         };
 
         // --- Google Pay ---
-        let paymentsClient = null;
-        let isGooglePayReady = false;
-
+        let paymentsClient = null; let isGooglePayReady = false;
         window.onGooglePayLoaded = () => {
-            paymentsClient = new google.payments.api.PaymentsClient({
-                environment: 'TEST',
-                paymentDataCallbacks: { onPaymentAuthorized: (paymentData) => new Promise(resolve => setTimeout(() => resolve({ transactionState: 'SUCCESS' }), 1000)) }
-            });
+            paymentsClient = new google.payments.api.PaymentsClient({ environment: 'TEST', paymentDataCallbacks: { onPaymentAuthorized: (paymentData) => new Promise(resolve => setTimeout(() => resolve({ transactionState: 'SUCCESS' }), 1000)) } });
             const isReadyToPayRequest = { apiVersion: 2, apiVersionMinor: 0, allowedPaymentMethods: [{ type: 'CARD', parameters: { allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"], allowedCardNetworks: ["AMEX", "DISCOVER", "INTERAC", "JCB", "MASTERCARD", "VISA"] }}] };
-            paymentsClient.isReadyToPay(isReadyToPayRequest).then(response => {
-                if (response.result) {
-                    isGooglePayReady = true;
-                    addGooglePayButtonToPremium();
-                    if (cartModal.classList.contains('visible')) updateCart();
-                } else console.warn("Google Pay is not available.");
-            }).catch(err => console.error("isReadyToPay error: ", err));
+            paymentsClient.isReadyToPay(isReadyToPayRequest).then(response => { if (response.result) { isGooglePayReady = true; addGooglePayButtonToPremium(); if (cartModal.classList.contains('visible')) updateCart(); } else console.warn("Google Pay is not available."); }).catch(err => console.error("isReadyToPay error: ", err));
         };
-        
         const createGooglePayRequest = (price) => ({ apiVersion: 2, apiVersionMinor: 0, allowedPaymentMethods: [{ type: 'CARD', parameters: { allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"], allowedCardNetworks: ["AMEX", "DISCOVER", "INTERAC", "JCB", "MASTERCARD", "VISA"] }, tokenizationSpecification: { type: 'PAYMENT_GATEWAY', parameters: { gateway: 'example', gatewayMerchantId: 'exampleGatewayMerchantId' }}}], transactionInfo: { totalPriceStatus: 'FINAL', totalPrice: price, currencyCode: 'JPY', countryCode: 'JP' }, merchantInfo: { merchantName: 'デモストア', merchantId: '01234567890123456789' }, callbackIntents: ['PAYMENT_AUTHORIZATION'] });
-
-        const processPayment = (paymentDataRequest, onSuccess) => {
-            loadingOverlay.style.display = 'flex';
-            setTimeout(() => { loadingOverlay.style.opacity = '1'; }, 10);
-            paymentsClient.loadPaymentData(paymentDataRequest).then(paymentData => onSuccess(paymentData)).catch(err => { if (err.statusCode !== 'CANCELED') alert(`エラーが発生しました: ${err.statusMessage || '詳細不明'}`); }).finally(() => { loadingOverlay.style.opacity = '0'; setTimeout(() => { loadingOverlay.style.display = 'none'; }, 300); });
-        };
-
+        const processPayment = (paymentDataRequest, onSuccess) => { loadingOverlay.style.display = 'flex'; setTimeout(() => { loadingOverlay.style.opacity = '1'; }, 10); paymentsClient.loadPaymentData(paymentDataRequest).then(paymentData => onSuccess(paymentData)).catch(err => { if (err.statusCode !== 'CANCELED') alert(`エラーが発生しました: ${err.statusMessage || '詳細不明'}`); }).finally(() => { loadingOverlay.style.opacity = '0'; setTimeout(() => { loadingOverlay.style.display = 'none'; }, 300); }); };
         const addGooglePayButtonToCart = (totalPrice) => {
-            const container = getEl('gpay-cart-container');
-            container.innerHTML = '';
-            if (!isGooglePayReady || !paymentsClient) return;
-            const button = paymentsClient.createButton({
-                onClick: () => processPayment(createGooglePayRequest(totalPrice.toString()), handleSuccessfulPurchase),
-                buttonColor: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'white' : 'black', buttonType: 'buy', buttonSizeMode: 'fill'
-            });
-            container.appendChild(button);
+            const container = getEl('gpay-cart-container'); container.innerHTML = ''; if (!isGooglePayReady || !paymentsClient) return;
+            const button = paymentsClient.createButton({ onClick: () => processPayment(createGooglePayRequest(totalPrice.toString()), handleSuccessfulPurchase), buttonColor: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'white' : 'black', buttonType: 'buy', buttonSizeMode: 'fill' }); container.appendChild(button);
         };
-
         const addGooglePayButtonToPremium = () => {
-            const container = getEl('gpay-premium-container');
-            container.innerHTML = '';
-            if (!isGooglePayReady || !paymentsClient) return;
-            const button = paymentsClient.createButton({
-                onClick: () => processPayment(createGooglePayRequest('600'), subscribeToPremium),
-                buttonColor: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'white' : 'black', buttonType: 'subscribe', buttonSizeMode: 'fill'
-            });
-            container.appendChild(button);
+            const container = getEl('gpay-premium-container'); container.innerHTML = ''; if (!isGooglePayReady || !paymentsClient) return;
+            const button = paymentsClient.createButton({ onClick: () => processPayment(createGooglePayRequest('600'), subscribeToPremium), buttonColor: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'white' : 'black', buttonType: 'subscribe', buttonSizeMode: 'fill' }); container.appendChild(button);
         };
 
         init();
