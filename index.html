@@ -115,7 +115,7 @@
         /* --- スイッチスタイル --- */
         .shipping-options .option-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .shipping-options .option-item .option-label { color: var(--text-color); }
-        .shipping-options .option-item[data-disabled="true"] .option-label { color: var(--secondary-text-color); }
+        .shipping-options .option-item[data-disabled="true"] .option-label { color: var(--secondary-text-color); text-decoration: line-through; }
         .switch { position: relative; display: inline-block; width: 50px; height: 26px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--secondary-bg-color); border: 1px solid var(--border-color); transition: .4s; border-radius: 26px; }
@@ -144,7 +144,8 @@
 
         /* --- フィルターモーダル --- */
         .filter-options { display: flex; flex-direction: column; gap: 15px; }
-        .filter-options label { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .filter-option-item { display: flex; justify-content: space-between; align-items: center; }
+        .filter-option-item label[for="filter-premium"] { cursor: pointer; }
         .filter-options .btn { margin-top: 10px; }
         
         /* --- プレミアム & プロフィール --- */
@@ -209,7 +210,7 @@
     <div id="cart-modal" class="modal"><div class="modal-content"><div class="modal-header"><h3>ショッピングカート</h3><button class="modal-close-btn" data-target="cart-modal"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg></button></div><div id="cart-items"></div><div id="cart-empty" class="hidden">カートは空です。</div><div id="cart-footer"><div class="cart-summary"><div id="cart-subtotal"></div><div id="cart-shipping-fee" class="shipping-fee"></div><div id="cart-total" class="cart-total"></div></div><div id="gpay-cart-container" class="gpay-button-container"></div></div></div></div>
     <div id="premium-modal" class="modal"><div class="modal-content"><div class="modal-header"><h3>プレミアムメンバーシップ (デモ)</h3><button class="modal-close-btn" data-target="premium-modal"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg></button></div><p>メンバーシップに登録して、限定特典をお楽しみください。</p><ul class="feature-list"></ul><p><small>メンバーシップはいつでも解約できます。</small></p><h4>料金 (デモ): ¥600/月</h4><div id="gpay-premium-container" class="gpay-button-container"></div></div></div>
     <div id="user-profile-modal" class="modal"><div class="modal-content"><div class="modal-header"><h3>ユーザープロフィール</h3><button class="modal-close-btn" data-target="user-profile-modal"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg></button></div><div id="user-profile-content"></div></div></div>
-    <div id="filter-modal" class="modal"><div class="modal-content"><div class="modal-header"><h3>フィルター</h3><button class="modal-close-btn" data-target="filter-modal"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg></button></div><div class="filter-options"><label><input type="checkbox" id="filter-premium"> プレミアム対象商品のみ表示</label><div><label for="filter-sort">並び順:</label><select id="filter-sort"><option value="default">おすすめ順</option><option value="price-asc">価格の安い順</option><option value="price-desc">価格の高い順</option></select></div><button id="apply-filters-btn" class="btn">適用する</button></div></div></div>
+    <div id="filter-modal" class="modal"><div class="modal-content"><div class="modal-header"><h3>フィルター</h3><button class="modal-close-btn" data-target="filter-modal"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg></button></div><div class="filter-options"><div class="filter-option-item"><label for="filter-premium">プレミアム対象商品のみ表示</label><label class="switch"><input type="checkbox" id="filter-premium"><span class="slider"></span></label></div><div><label for="filter-sort">並び順:</label><select id="filter-sort"><option value="default">おすすめ順</option><option value="price-asc">価格の安い順</option><option value="price-desc">価格の高い順</option></select></div><button id="apply-filters-btn" class="btn">適用する</button></div></div></div>
     <div id="delivery-status-modal" class="modal"><div class="modal-content"><div class="modal-header"><h3>配送状況</h3><button class="modal-close-btn" data-target="delivery-status-modal"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg></button></div><div class="delivery-status-container"><h4 id="delivery-status-text" class="status-text">注文を受け付けました</h4><div class="progress-bar-container"><div id="delivery-progress-bar" class="progress-bar"></div></div><div id="delivery-complete-msg" class="hidden">商品が届きました (デモ)</div></div></div></div>
 
     <script>
@@ -425,7 +426,7 @@
                 conditionOptionsHtml += `<label class="condition-option"><input type="radio" name="condition-option" value="${opt.id}"><span>中古品 - <span class="condition-state">${opt.name}</span></span></label>`;
             });
 
-            const premiumOnlyDisabled = isPremiumMember ? '' : 'disabled';
+            const premiumOnlyDisabled = (isPremiumMember && product.isPremiumEligible) ? '' : 'disabled';
 
             productDetailPage.innerHTML = `<div class="product-detail-content" data-product-id="${product.id}">
                 <button class="btn back-button" style="flex-grow:0; margin-bottom: 20px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/></svg> 商品一覧に戻る</button>
@@ -434,7 +435,7 @@
                 <div id="delivery-info-display" class="info-box">${truckIcon} <span></span></div>
                 <div class="condition-selector"><h4>商品の状態を選択</h4>${conditionOptionsHtml}</div>
                 <div class="info-box shipping-options">
-                    <h4>配送オプション (プレミアム会員限定)</h4>
+                    <h4>配送オプション</h4>
                     <div class="option-item" id="express-option-item">
                         <span class="option-label">お急ぎ便を利用する</span>
                         <label class="switch">
@@ -484,8 +485,10 @@
             const expressCheckbox = getEl('shipping-express-checkbox');
             const scheduledCheckbox = getEl('shipping-scheduled-checkbox');
 
-            // プレミアム会員でない場合はスイッチを無効化し、チェックを外す
-            if (!isPremiumMember) {
+            const canUsePremiumOptions = isPremiumMember && product.isPremiumEligible;
+            
+            // プレミアムオプションが利用できない場合はスイッチを無効化し、チェックを外す
+            if (!canUsePremiumOptions) {
                 expressCheckbox.checked = false;
                 scheduledCheckbox.checked = false;
                 expressCheckbox.disabled = true;
@@ -495,7 +498,7 @@
             } else {
                 expressCheckbox.disabled = false;
                 scheduledCheckbox.disabled = false;
-                 getEl('express-option-item').dataset.disabled = false;
+                getEl('express-option-item').dataset.disabled = false;
                 getEl('scheduled-option-item').dataset.disabled = false;
             }
             
@@ -537,7 +540,7 @@
             getEl('delivery-info-display').querySelector('span').innerHTML = deliveryText;
 
             // 日時指定ピッカーの表示制御
-            getEl('date-time-picker-container').classList.toggle('hidden', !isScheduled || !isPremiumMember);
+            getEl('date-time-picker-container').classList.toggle('hidden', !isScheduled || !canUsePremiumOptions);
         };
         
         // --- 機能別関数 ---
