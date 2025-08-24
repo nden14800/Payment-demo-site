@@ -292,8 +292,7 @@
                 }
                 if (e.target.closest('.delivery-tracking-btn')) {
                     const orderId = e.target.closest('.delivery-tracking-btn').dataset.orderId;
-                    const order = purchaseHistory.find(o => o.id === orderId);
-                    if(order) startDeliveryTracking(order.options);
+                    startDeliveryTracking(orderId);
                 }
             });
             productDetailPage.addEventListener('change', e => {
@@ -525,48 +524,109 @@
                 location.reload();
             }
         };
-        const startDeliveryTracking = (options) => {
+
+        const startDeliveryTracking = (orderId) => {
             clearInterval(deliveryStatusInterval);
+            const order = purchaseHistory.find(o => o.id === orderId);
+            if (!order) return;
+
+            // deliverySim オブジェクトがなければ初期化
+            if (!order.deliverySim) {
+                order.deliverySim = { startTime: null, completed: false };
+            }
+
+            // 初めて追跡ボタンが押された場合、開始時刻を記録
+            if (order.deliverySim.startTime === null && !order.deliverySim.completed) {
+                order.deliverySim.startTime = Date.now();
+                localStorage.setItem('purchaseHistory', JSON.stringify(purchaseHistory));
+            }
+            
+            // UI要素の取得
             const progressBar = getEl('delivery-progress-bar');
             const statusText = getEl('delivery-status-text');
             const completeMsg = getEl('delivery-complete-msg');
-            const isExpress = options?.isExpress || false;
-            
-            progressBar.style.width = '0%';
-            statusText.textContent = '注文を受け付けました';
-            completeMsg.classList.add('hidden');
-            deliveryStatusModal.classList.add('visible');
 
-            const statuses = ['発送準備中', '発送済み', '配送中', 'お届け完了'];
-            let currentStatusIndex = 0;
+            // シミュレーション設定
+            const statuses = ['注文を受け付けました', '発送準備中', '発送済み', '配送中', 'お届け完了'];
+            const isExpress = order.options?.isExpress || false;
             const intervalTime = isExpress ? 1000 : 2000;
+            
+            let currentStatusIndex = 0;
 
-            const updateStatus = () => {
-                currentStatusIndex++;
-                progressBar.style.width = `${(currentStatusIndex / statuses.length) * 100}%`;
-                statusText.textContent = statuses[currentStatusIndex -1];
-                if (currentStatusIndex >= statuses.length) {
-                    clearInterval(deliveryStatusInterval);
+            const updateUI = () => {
+                if (currentStatusIndex >= statuses.length) return;
+                
+                statusText.textContent = statuses[currentStatusIndex];
+                progressBar.style.width = `${(currentStatusIndex / (statuses.length - 1)) * 100}%`;
+
+                if (currentStatusIndex === statuses.length - 1) {
+                    if (!order.deliverySim.completed) {
+                       order.deliverySim.completed = true;
+                       localStorage.setItem('purchaseHistory', JSON.stringify(purchaseHistory));
+                    }
                     completeMsg.classList.remove('hidden');
+                    clearInterval(deliveryStatusInterval);
+                } else {
+                    completeMsg.classList.add('hidden');
                 }
             };
-            deliveryStatusInterval = setInterval(updateStatus, intervalTime);
+            
+            // シミュレーションが完了済みの場合は、最終状態を表示して終了
+            if (order.deliverySim.completed) {
+                currentStatusIndex = statuses.length - 1;
+                updateUI();
+                deliveryStatusModal.classList.add('visible');
+                return;
+            }
+
+            // 経過時間から現在の状態を計算
+            const elapsedTime = Date.now() - order.deliverySim.startTime;
+            const initialStatusIndex = Math.min(Math.floor(elapsedTime / intervalTime), statuses.length - 1);
+            currentStatusIndex = initialStatusIndex;
+            updateUI();
+
+            // 次の更新までの残り時間を計算
+            const remainingTime = intervalTime - (elapsedTime % intervalTime);
+
+            // シミュレーションがまだ終わっていなければ、次の更新をスケジュールする
+            if (currentStatusIndex < statuses.length - 1) {
+                setTimeout(() => {
+                    currentStatusIndex++;
+                    updateUI();
+                    
+                    // 最初のsetTimeoutの後、通常のsetIntervalを開始
+                    if (currentStatusIndex < statuses.length - 1) {
+                        deliveryStatusInterval = setInterval(() => {
+                            currentStatusIndex++;
+                            updateUI();
+                        }, intervalTime);
+                    }
+                }, remainingTime);
+            }
+
+            deliveryStatusModal.classList.add('visible');
         };
+
         const handleSuccessfulPurchase = () => {
             alert('デモ決済が完了しました！');
             const purchaseOptions = cart.reduce((opts, item) => ({...opts, ...item.options}), {});
             
-            purchaseHistory.unshift({ 
+            const newPurchase = { 
                 id: self.crypto.randomUUID(),
                 date: new Date().toLocaleString('ja-JP'), 
                 items: cart.map(item => ({...products.find(p => p.id === item.id), quantity: item.quantity })),
-                options: purchaseOptions
-            });
+                options: purchaseOptions,
+                deliverySim: { startTime: null, completed: false } // 配送シミュレーション状態を追加
+            };
+
+            purchaseHistory.unshift(newPurchase);
             localStorage.setItem('purchaseHistory', JSON.stringify(purchaseHistory));
             cart = [];
             updateCart();
             cartModal.classList.remove('visible');
-            startDeliveryTracking(purchaseOptions);
+            
+            // 購入直後の自動追跡は行わず、ユーザー操作を待つ
+            // startDeliveryTracking(newPurchase.id); 
         };
 
         // --- Google Pay ---
